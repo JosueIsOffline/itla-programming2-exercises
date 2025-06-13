@@ -10,5 +10,6 @@ namespace FitStarter.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Routine> Routines { get; set; }
     }
 }
