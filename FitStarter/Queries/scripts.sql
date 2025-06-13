@@ -9,7 +9,7 @@ USE FitStarter;
 -- USERS
 -- ================================
 CREATE TABLE users (
-    user_id INT IDENTITY(1,1) PRIMARY KEY,
+    id INT IDENTITY(1,1) PRIMARY KEY,
     full_name NVARCHAR(100) NOT NULL,
     email NVARCHAR(150) NOT NULL UNIQUE,
     password_hash NVARCHAR(255) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE users (
 -- EXERCISES
 -- ================================
 CREATE TABLE exercises (
-    exercise_id INT IDENTITY(1,1) PRIMARY KEY,
+    id INT IDENTITY(1,1) PRIMARY KEY,
     exercise_name NVARCHAR(100) NOT NULL,
     description NVARCHAR(MAX),
     muscle_group NVARCHAR(50),
@@ -42,7 +42,7 @@ CREATE TABLE exercises (
 -- WORKOUT ROUTINES
 -- ================================
 CREATE TABLE routines (
-    routine_id INT IDENTITY(1,1) PRIMARY KEY,
+    id INT IDENTITY(1,1) PRIMARY KEY,
     routine_name NVARCHAR(100) NOT NULL,
     description NVARCHAR(MAX),
     difficulty NVARCHAR(20) CHECK (difficulty IN ('beginner', 'intermediate', 'advanced')) DEFAULT 'beginner',
@@ -71,7 +71,7 @@ CREATE TABLE routine_exercises (
 -- WORKOUT SESSIONS (User's actual workouts)
 -- ================================
 CREATE TABLE workout_sessions (
-    session_id INT IDENTITY(1,1) PRIMARY KEY,
+    id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT,
     routine_id INT,
     session_date DATE,
@@ -89,7 +89,7 @@ CREATE TABLE workout_sessions (
 -- PROGRESS TRACKING
 -- ================================
 CREATE TABLE user_progress (
-    progress_id INT IDENTITY(1,1) PRIMARY KEY,
+    id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT,
     record_date DATE,
     weight_kg DECIMAL(5,2),
@@ -102,7 +102,7 @@ CREATE TABLE user_progress (
 -- NUTRITION TIPS
 -- ================================
 CREATE TABLE nutrition_tips (
-    tip_id INT IDENTITY(1,1) PRIMARY KEY,
+    id INT IDENTITY(1,1) PRIMARY KEY,
     tip_title NVARCHAR(150) NOT NULL,
     tip_content NVARCHAR(MAX) NOT NULL,
     tip_category NVARCHAR(20) CHECK (tip_category IN ('pre_workout', 'post_workout', 'general', 'hydration')) DEFAULT 'general',
@@ -114,7 +114,7 @@ CREATE TABLE nutrition_tips (
 -- TIMER RECORDS (For tracking workout timers)
 -- ================================
 CREATE TABLE timer_records (
-    timer_id INT IDENTITY(1,1) PRIMARY KEY,
+    id INT IDENTITY(1,1) PRIMARY KEY,
     user_id INT,
     session_id INT,
     timer_type NVARCHAR(20) CHECK (timer_type IN ('workout', 'exercise', 'rest')) DEFAULT 'workout',
