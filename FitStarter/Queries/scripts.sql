@@ -63,8 +63,8 @@ CREATE TABLE routine_exercises (
     reps INT DEFAULT 10,
     duration_seconds INT DEFAULT 60,
     rest_seconds INT DEFAULT 30,
-    FOREIGN KEY (routine_id) REFERENCES routines(routine_id) ON DELETE CASCADE,
-    FOREIGN KEY (exercise_id) REFERENCES exercises(exercise_id)
+    FOREIGN KEY (routine_id) REFERENCES routines(id) ON DELETE CASCADE,
+    FOREIGN KEY (exercise_id) REFERENCES exercises(id)
 );
 
 -- ================================
@@ -81,8 +81,8 @@ CREATE TABLE workout_sessions (
     calories_burned INT,
     completed BIT DEFAULT 0,
     user_notes NVARCHAR(MAX),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (routine_id) REFERENCES routines(routine_id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (routine_id) REFERENCES routines(id)
 );
 
 -- ================================
@@ -95,7 +95,7 @@ CREATE TABLE user_progress (
     weight_kg DECIMAL(5,2),
     body_fat_percent DECIMAL(4,1),
     notes NVARCHAR(MAX),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- ================================
@@ -120,8 +120,8 @@ CREATE TABLE timer_records (
     timer_type NVARCHAR(20) CHECK (timer_type IN ('workout', 'exercise', 'rest')) DEFAULT 'workout',
     duration_seconds INT,
     used_at DATETIME2 DEFAULT GETDATE(),
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
-    FOREIGN KEY (session_id) REFERENCES workout_sessions(session_id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (session_id) REFERENCES workout_sessions(id)
 );
 
 -- ================================
@@ -186,6 +186,9 @@ CREATE NONCLUSTERED INDEX IX_workout_sessions_user_date ON workout_sessions(user
 CREATE NONCLUSTERED INDEX IX_user_progress_user_date ON user_progress(user_id, record_date);
 CREATE NONCLUSTERED INDEX IX_routine_exercises_routine ON routine_exercises(routine_id, exercise_order);
 
+
+
+SELECT * FROM Users
 ---- ================================
 ---- HELPFUL VIEWS
 ---- ================================

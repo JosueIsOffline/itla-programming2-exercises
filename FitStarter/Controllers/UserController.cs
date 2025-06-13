@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace FitStarter.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class UserContoller : ControllerBase
+    [Route("api/")]
+    public class UserController : ControllerBase
     {
         private readonly IBaseRepository<User> _userRepository;
         private readonly IMapper _mapper;
 
-        public UserContoller(IBaseRepository<User> userRepository, IMapper mapper)
+        public UserController(IBaseRepository<User> userRepository, IMapper mapper)
         {
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
