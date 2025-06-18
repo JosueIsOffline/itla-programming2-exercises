@@ -43,7 +43,7 @@ const navigationItems = [
     title: "Cronómetro",
     url: "/timer",
     icon: Timer,
-    description: "Temporizador de entrenamientos",
+    description: "Temporizador",
   },
   {
     title: "Progreso",
@@ -72,16 +72,16 @@ export default function AppSidebar() {
   const { pathname } = useLocation();
 
   return (
-    <Sidebar className="border-r">
-      <SidebarHeader className="border-b px-6 py-4">
+    <Sidebar className="border-r border-gray-200/60">
+      <SidebarHeader className="border-b border-gray-200/60 px-6 py-4">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600">
             <Activity className="h-5 w-5 text-white" />
           </div>
-          {/* <div> */}
-          {/*   <h1 className="text-lg font-bold text-red-500">FitStarter</h1> */}
-          {/*   <p className="text-xs text-gray-500">Entrenador Virtual</p> */}
-          {/* </div> */}
+          <div>
+            <h1 className="text-lg font-bold text-red-500">FitStarter</h1>
+            {/* <p className="text-xs text-gray-500">Entrenador Virtual</p> */}
+          </div>
         </div>
       </SidebarHeader>
 
@@ -185,7 +185,7 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-4">
+      <SidebarFooter className="border-t border-gray-200/60 p-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10">
             <AvatarImage
@@ -193,12 +193,12 @@ export default function AppSidebar() {
               alt="Ana García"
             />
             <AvatarFallback className="bg-red-600 text-white">
-              AG
+              JH
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-red-600 truncate">
-              Ana García
+              Josue Hernandez
             </p>
             <div className="flex items-center gap-2">
               {/* <Badge variant="secondary" className="text-xs"> */}
