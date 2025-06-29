@@ -10,22 +10,43 @@ import Progress from "./pages/progress.tsx";
 import Nutrition from "./pages/nutrition.tsx";
 import Timer from "./pages/timer.tsx";
 import NotFound from "./pages/not-found.tsx";
+import AuthProvider, { useAuth } from "./components/auth-provider.tsx";
+import ProtectedRoute from "./components/protected-route.tsx";
+import { AuthPage } from "./pages/auth.tsx";
+// Datos de ejemplo
+const userData = {
+  name: "Josue Hernandez",
+  email: "ana.garcia@email.com",
+  fitnessGoal: "lose_weight",
+  currentWeight: 70.5,
+  targetWeight: 68.0,
+  memberSince: "2024-01-15",
+};
 
 const router = createBrowserRouter([
   {
+    path: "/auth",
+    element: <AuthPage />,
+  },
+  {
     path: "/",
     element: (
-      <Layout title="FitStarter">
-        <Outlet />
-      </Layout>
+      <ProtectedRoute>
+        <Layout title="FitStarter">
+          <Outlet />
+        </Layout>
+      </ProtectedRoute>
     ),
     children: [
-      { path: "", element: <Dashboard /> },
+      {
+        path: "/",
+        element: <Dashboard />,
+      },
       { path: "/exercises", element: <Exercises /> },
       { path: "/timer", element: <Timer /> },
       { path: "/progress", element: <Progress /> },
       { path: "/nutrition", element: <Nutrition /> },
-      { path: "settings", element: <Settings /> },
+      { path: "/settings", element: <Settings /> },
       { path: "*", element: <NotFound /> },
     ],
   },
@@ -33,6 +54,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );

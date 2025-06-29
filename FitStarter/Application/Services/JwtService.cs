@@ -1,7 +1,6 @@
 using FitStarter.Data;
 using FitStarter.Domain.Configuration;
 using FitStarter.Domain.Entities;
-using FitStarter.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -50,7 +49,9 @@ namespace FitStarter.Services
                 signingCredentials: credentials
             );
 
+
             return new JwtSecurityTokenHandler().WriteToken(token);
+
         }
 
         public string GenerateRefreshToken()
@@ -116,8 +117,8 @@ namespace FitStarter.Services
             var refreshToken = await _context.RefreshTokens
                 .FirstOrDefaultAsync(rt => rt.Token == token);
 
-            return refreshToken != null && 
-                   !refreshToken.IsRevoked && 
+            return refreshToken != null &&
+                   !refreshToken.IsRevoked &&
                    refreshToken.ExpiryDate > DateTime.UtcNow;
         }
 
