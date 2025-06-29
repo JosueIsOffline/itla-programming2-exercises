@@ -11,6 +11,7 @@ namespace FitStarter.Domain.Mapping
         {
             CreateMap<CreateUser, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
             CreateMap<UpdateUser, User>()
