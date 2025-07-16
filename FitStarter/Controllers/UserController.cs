@@ -2,12 +2,14 @@
 using FitStarter.Domain.Contracts;
 using FitStarter.Domain.Entities;
 using FitStarter.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitStarter.Controllers
 {
     [ApiController]
     [Route("api/")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IBaseRepository<User> _userRepository;

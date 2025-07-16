@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useAuth } from "./auth-provider";
 
 const navigationItems = [
   {
@@ -70,16 +71,17 @@ const secondaryItems = [
 
 export default function AppSidebar() {
   const { pathname } = useLocation();
+  const { currentUser } = useAuth();
 
   return (
     <Sidebar className="border-r border-gray-200/60">
       <SidebarHeader className="border-b border-gray-200/60 px-6 py-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600">
             <Activity className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-red-500">FitStarter</h1>
+            <h1 className="text-lg font-bold text-purple-500">FitStarter</h1>
             {/* <p className="text-xs text-gray-500">Entrenador Virtual</p> */}
           </div>
         </div>
@@ -99,8 +101,8 @@ export default function AppSidebar() {
                     <SidebarMenuButton
                       isActive={isActive}
                       className={cn(
-                        "w-full transition-colors h-10 pb-2.5 hover:bg-red-600/60",
-                        isActive && "!bg-red-600/60",
+                        "w-full transition-colors h-10 pb-2.5 hover:bg-purple-600/60",
+                        isActive && "!bg-purple-600/60",
                       )}
                       asChild
                     >
@@ -136,8 +138,8 @@ export default function AppSidebar() {
                     <SidebarMenuButton
                       isActive={isActive}
                       className={cn(
-                        "w-full transition-colors h-10 pb-2.5 hover:bg-red-600/60",
-                        isActive && "!bg-red-600/60",
+                        "w-full transition-colors h-10 pb-2.5 hover:bg-purple-600/60",
+                        isActive && "!bg-purple-600/60",
                       )}
                       asChild
                     >
@@ -192,13 +194,21 @@ export default function AppSidebar() {
               src="/placeholder.svg?height=40&width=40"
               alt="Ana García"
             />
-            <AvatarFallback className="bg-red-600 text-white">
-              JH
+            <AvatarFallback className="bg-purple-600 text-white">
+              {currentUser?.fullName
+                .trim()
+                .split(" ")
+                .filter((p) => p.length > 0)
+                .reduce((acc, val, idx, arr) => {
+                  if (idx === 0) return val[0];
+                  if (idx === arr.length - 2) return acc + val[0];
+                  return acc;
+                }, "")}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-red-600 truncate">
-              Josue Hernandez
+            <p className="text-sm font-medium text-purple-600 truncate">
+              {currentUser?.fullName}
             </p>
             <div className="flex items-center gap-2">
               {/* <Badge variant="secondary" className="text-xs"> */}

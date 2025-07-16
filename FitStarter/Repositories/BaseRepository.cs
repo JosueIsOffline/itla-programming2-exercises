@@ -20,7 +20,6 @@ namespace FitStarter.Repositories
             return entity;
         }
 
-        
         public Task<List<T>> GetAll(params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _context.Set<T>();
@@ -38,16 +37,14 @@ namespace FitStarter.Repositories
         public async Task<T> Update(T entity)
         {
             _context.Set<T>().Update(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return entity;
-
-
         }
 
         public async Task<T> Delete(int id)
         {
             var entity = await _context.Set<T>().FindAsync(id);
-            if(entity != null)
+            if (entity != null)
             {
                 _context.Set<T>().Remove(entity);
                 await _context.SaveChangesAsync();
@@ -56,6 +53,6 @@ namespace FitStarter.Repositories
             return entity ?? throw new KeyNotFoundException($"Entity with Id {id} not found.");
         }
 
-        
+
     }
 }

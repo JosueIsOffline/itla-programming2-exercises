@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -24,17 +23,14 @@ import {
   Sun,
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
+import { useAuth } from "./auth-provider";
 
-interface HeaderProps {
-  userData: {
-    name: string;
-    email: string;
-    fitnessGoal: string;
-  };
-}
-
-export default function Header({ userData }: HeaderProps) {
+export default function Header() {
   const { setTheme } = useTheme();
+
+  const { currentUser, handleLogout } = useAuth();
+  const userData = currentUser;
+
   const theme = localStorage.getItem("vite-ui-theme");
 
   const getGoalBadge = (goal: string) => {
@@ -50,7 +46,7 @@ export default function Header({ userData }: HeaderProps) {
     }
   };
 
-  const goalBadge = getGoalBadge(userData.fitnessGoal);
+  const goalBadge = getGoalBadge(userData?.fitnessGoal as string);
 
   const handleTheme = () => {
     theme == "dark" ? setTheme("light") : setTheme("dark");
@@ -62,8 +58,8 @@ export default function Header({ userData }: HeaderProps) {
         <SidebarTrigger />
 
         <div className="hidden md:flex items-center gap-2">
-          <h2 className="text-lg text-nowrap font-semibold text-red-500">
-            ¡Hola, {userData?.name.split(" ")[0]}!
+          <h2 className="text-lg text-nowrap font-semibold text-purple-500">
+            ¡Hola, {userData?.fullName}!
           </h2>
           <Badge className={goalBadge.color}>{goalBadge.text}</Badge>
         </div>
@@ -85,7 +81,7 @@ export default function Header({ userData }: HeaderProps) {
         {/* Notifications */}
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 h-4 w-4 bg-purple-500 text-white text-xs rounded-full flex items-center justify-center">
             2
           </span>
         </Button>
@@ -97,10 +93,10 @@ export default function Header({ userData }: HeaderProps) {
               <Avatar className="h-10 w-10">
                 <AvatarImage
                   src="/placeholder.svg?height=40&width=40"
-                  alt={userData?.name}
+                  alt={userData?.fullName}
                 />
-                <AvatarFallback className="bg-red-500 text-white">
-                  {userData?.name
+                <AvatarFallback className="bg-purple-500 text-white">
+                  {userData?.fullName
                     .split(" ")
                     .map((n) => n[0])
                     .join("")}
@@ -112,7 +108,7 @@ export default function Header({ userData }: HeaderProps) {
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">
-                  {userData?.name}
+                  {userData?.fullName}
                 </p>
                 <p className="text-xs leading-none text-muted-foreground">
                   {userData?.email}
@@ -135,7 +131,7 @@ export default function Header({ userData }: HeaderProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Cerrar sesión</span>
+              <span onClick={handleLogout}>Cerrar sesión</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

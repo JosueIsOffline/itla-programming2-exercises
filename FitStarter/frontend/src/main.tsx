@@ -11,16 +11,29 @@ import WorkoutTimer from "./pages/timer.tsx";
 import ProgressTracker from "./pages/progress.tsx";
 import NutritionTips from "./pages/nutrition.tsx";
 
+import AuthProvider from "./components/auth-provider.tsx";
+import ProtectedRoute from "./components/protected-route.tsx";
+import { AuthPage } from "./pages/auth.tsx";
+
 const router = createBrowserRouter([
+  {
+    path: "/auth",
+    element: <AuthPage />,
+  },
   {
     path: "/",
     element: (
-      <Layout title="FitStarter">
-        <Outlet />
-      </Layout>
+      <ProtectedRoute>
+        <Layout>
+          <Outlet />
+        </Layout>
+      </ProtectedRoute>
     ),
     children: [
-      { path: "", element: <Dashboard /> },
+      {
+        path: "/",
+        element: <Dashboard />,
+      },
       { path: "/exercises", element: <Exercises /> },
       { path: "/timer", element: <WorkoutTimer /> },
       { path: "/progress", element: <ProgressTracker /> },
@@ -33,6 +46,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );
