@@ -1,35 +1,22 @@
-"use client";
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import PersonalInfoStep from "./steps/personal-info-step";
 import FitnessGoalsStep from "./steps/fitness-goals-step";
 import ConfirmationStep from "./steps/confirmation-step";
+import { useAuth } from "@/components/auth-provider";
+import { useNavigate } from "react-router-dom";
+import type { RegisterData } from "@/types/user";
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
-}
-
-export interface RegisterData {
-  // Paso 1: Información personal
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-
-  // Paso 2: Objetivos fitness
-  fitnessGoal: string;
-  currentWeight: string;
-  targetWeight: string;
-  height: string;
-  activityLevel: string;
-  experience: string;
-
-  // Paso 3: Confirmación
-  acceptTerms: boolean;
-  acceptMarketing: boolean;
 }
 
 const initialData: RegisterData = {
@@ -38,19 +25,19 @@ const initialData: RegisterData = {
   password: "",
   confirmPassword: "",
   fitnessGoal: "",
-  currentWeight: "",
-  targetWeight: "",
-  height: "",
-  activityLevel: "",
-  experience: "",
-  acceptTerms: false,
-  acceptMarketing: false,
+  weightKg: 0,
+  heightCm: 0,
+  experienceLevel: "",
 };
 
 export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<RegisterData>(initialData);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const { handleRegister, isLoading } = useAuth();
+  const navigate = useNavigate();
 
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
@@ -66,6 +53,7 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     value: string | boolean,
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (error) setError(""); // Limpiar error al escribir
   };
 
   const handleNext = () => {
@@ -81,15 +69,19 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
+    setError("");
+    setSuccess("");
 
-    // Simular registro
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log("Datos de registro:", formData);
-      // Aquí iría la lógica de registro real
-      onSwitchToLogin();
-    }, 2000);
+    const result = await handleRegister(formData);
+
+    if (result.success) {
+      setSuccess("¡Cuenta creada exitosamente! Redirigiendo...");
+      setTimeout(() => {
+        navigate("/", { replace: true });
+      }, 2000);
+    } else {
+      setError(result.error || "Error al crear la cuenta");
+    }
   };
 
   const isStepValid = () => {
@@ -104,13 +96,12 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       case 2:
         return (
           formData.fitnessGoal !== "" &&
-          formData.currentWeight !== "" &&
-          formData.height !== "" &&
-          formData.activityLevel !== "" &&
-          formData.experience !== ""
+          formData.weightKg !== 0 &&
+          formData.heightCm !== 0 &&
+          formData.experienceLevel !== ""
         );
       case 3:
-        return formData.acceptTerms;
+        return true;
       default:
         return false;
     }
@@ -167,6 +158,23 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
           {stepTitles[currentStep - 1]}
         </p>
       </div>
+
+      {/* Alerts */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {success && (
+        <Alert className="border-green-200 bg-green-50">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            {success}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Step Content */}
       <div className="min-h-[400px]">{renderStep()}</div>

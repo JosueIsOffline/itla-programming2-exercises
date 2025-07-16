@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -25,19 +24,13 @@ import {
 } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "./auth-provider";
-//
-// interface HeaderProps {
-//   userData: {
-//     name: string;
-//     email: string;
-//     fitnessGoal: string;
-//   };
-// }
 
 export default function Header() {
   const { setTheme } = useTheme();
+
   const { currentUser, handleLogout } = useAuth();
   const userData = currentUser;
+
   const theme = localStorage.getItem("vite-ui-theme");
 
   const getGoalBadge = (goal: string) => {
@@ -53,7 +46,7 @@ export default function Header() {
     }
   };
 
-  const goalBadge = getGoalBadge(userData?.FitnessGoal as string);
+  const goalBadge = getGoalBadge(userData?.fitnessGoal as string);
 
   const handleTheme = () => {
     theme == "dark" ? setTheme("light") : setTheme("dark");
@@ -65,8 +58,8 @@ export default function Header() {
         <SidebarTrigger />
 
         <div className="hidden md:flex items-center gap-2">
-          <h2 className="text-lg text-nowrap font-semibold text-red-500">
-            ¡Hola, {userData?.FullName}!
+          <h2 className="text-lg text-nowrap font-semibold text-purple-500">
+            ¡Hola, {userData?.fullName}!
           </h2>
           <Badge className={goalBadge.color}>{goalBadge.text}</Badge>
         </div>
@@ -88,7 +81,7 @@ export default function Header() {
         {/* Notifications */}
         <Button variant="ghost" size="sm" className="relative">
           <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 h-4 w-4 bg-purple-500 text-white text-xs rounded-full flex items-center justify-center">
             2
           </span>
         </Button>
@@ -100,10 +93,13 @@ export default function Header() {
               <Avatar className="h-10 w-10">
                 <AvatarImage
                   src="/placeholder.svg?height=40&width=40"
-                  alt={userData?.FullName}
+                  alt={userData?.fullName}
                 />
-                <AvatarFallback className="bg-red-500 text-white">
-                  {userData?.FullName}
+                <AvatarFallback className="bg-purple-500 text-white">
+                  {userData?.fullName
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -112,10 +108,10 @@ export default function Header() {
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">
-                  {userData?.FullName}
+                  {userData?.fullName}
                 </p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  {userData?.Email}
+                  {userData?.email}
                 </p>
               </div>
             </DropdownMenuLabel>

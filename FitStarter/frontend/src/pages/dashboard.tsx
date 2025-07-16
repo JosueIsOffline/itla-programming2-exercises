@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
   Activity,
@@ -42,7 +41,6 @@ export default function Dashboard() {
   const calorieGoal = 300;
   // const calorieProgress = (totalCalories / calorieGoal) * 100;
   const userData = currentUser;
-  console.log(currentUser);
 
   const achievements = [
     {
@@ -95,11 +93,12 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-red-600 to-red-800/60 rounded-xl p-6 text-white">
+
+      <div className="bg-gradient-to-r from-purple-600 to-purple-800/60 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2">
-              ¡Bienvenido de vuelta, {userData?.FullName}!
+              ¡Bienvenido de vuelta, {userData?.fullName}!
             </h1>
             <p className="text-blue-100 mb-4">
               Estás a solo{" "}
@@ -110,7 +109,7 @@ export default function Dashboard() {
             </p>
             <Button
               variant="secondary"
-              className="bg-white text-red-600 hover:bg-gray-100"
+              className="bg-white text-purple-600 hover:bg-gray-100"
             >
               <Zap className="mr-2 h-4 w-4" />
               Comenzar Entrenamiento

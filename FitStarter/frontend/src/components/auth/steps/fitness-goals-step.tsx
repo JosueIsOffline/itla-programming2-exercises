@@ -1,5 +1,3 @@
-"use client";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -11,7 +9,8 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Target, Scale, Ruler, Activity, Award } from "lucide-react";
-import type { RegisterData } from "../register-form";
+
+import type { RegisterData } from "@/types/user";
 
 interface FitnessGoalsStepProps {
   formData: RegisterData;
@@ -140,31 +139,29 @@ export default function FitnessGoalsStep({
                 type="number"
                 step="0.1"
                 placeholder="70.0"
-                value={formData.currentWeight}
-                onChange={(e) =>
-                  updateFormData("currentWeight", e.target.value)
-                }
+                value={formData.weightKg}
+                onChange={(e) => updateFormData("weightKg", e.target.value)}
                 className="pl-10"
                 required
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="targetWeight">Peso objetivo (kg)</Label>
-            <div className="relative">
-              <Target className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="targetWeight"
-                type="number"
-                step="0.1"
-                placeholder="65.0"
-                value={formData.targetWeight}
-                onChange={(e) => updateFormData("targetWeight", e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
+          {/* <div className="space-y-2"> */}
+          {/*   <Label htmlFor="targetWeight">Peso objetivo (kg)</Label> */}
+          {/*   <div className="relative"> */}
+          {/*     <Target className="absolute left-3 top-3 h-4 w-4 text-gray-400" /> */}
+          {/*     <Input */}
+          {/*       id="targetWeight" */}
+          {/*       type="number" */}
+          {/*       step="0.1" */}
+          {/*       placeholder="65.0" */}
+          {/*       value={formData.targetWeight} */}
+          {/*       onChange={(e) => updateFormData("targetWeight", e.target.value)} */}
+          {/*       className="pl-10" */}
+          {/*     /> */}
+          {/*   </div> */}
+          {/* </div> */}
 
           <div className="space-y-2">
             <Label htmlFor="height">Altura (cm) *</Label>
@@ -174,8 +171,8 @@ export default function FitnessGoalsStep({
                 id="height"
                 type="number"
                 placeholder="170"
-                value={formData.height}
-                onChange={(e) => updateFormData("height", e.target.value)}
+                value={formData.heightCm}
+                onChange={(e) => updateFormData("heightCm", e.target.value)}
                 className="pl-10"
                 required
               />
@@ -184,37 +181,38 @@ export default function FitnessGoalsStep({
         </div>
 
         {/* Nivel de Actividad */}
-        <div className="space-y-2">
-          <Label>Nivel de actividad actual *</Label>
-          <Select
-            value={formData.activityLevel}
-            onValueChange={(value) => updateFormData("activityLevel", value)}
-          >
-            <SelectTrigger>
-              <Activity className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Selecciona tu nivel de actividad" />
-            </SelectTrigger>
-            <SelectContent>
-              {activityLevels.map((level) => (
-                <SelectItem key={level.value} value={level.value}>
-                  <div>
-                    <div className="font-medium">{level.label}</div>
-                    <div className="text-xs text-gray-600">
-                      {level.description}
-                    </div>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+
+        {/* <div className="space-y-2"> */}
+        {/*   <Label>Nivel de actividad actual *</Label> */}
+        {/*   <Select */}
+        {/*     value={formData.activityLevel} */}
+        {/*     onValueChange={(value) => updateFormData("activityLevel", value)} */}
+        {/*   > */}
+        {/*     <SelectTrigger> */}
+        {/*       <Activity className="h-4 w-4 mr-2" /> */}
+        {/*       <SelectValue placeholder="Selecciona tu nivel de actividad" /> */}
+        {/*     </SelectTrigger> */}
+        {/*     <SelectContent> */}
+        {/*       {activityLevels.map((level) => ( */}
+        {/*         <SelectItem key={level.value} value={level.value}> */}
+        {/*           <div> */}
+        {/*             <div className="font-medium">{level.label}</div> */}
+        {/*             <div className="text-xs text-gray-600"> */}
+        {/*               {level.description} */}
+        {/*             </div> */}
+        {/*           </div> */}
+        {/*         </SelectItem> */}
+        {/*       ))} */}
+        {/*     </SelectContent> */}
+        {/*   </Select> */}
+        {/* </div> */}
 
         {/* Experiencia */}
         <div className="space-y-2">
           <Label>Experiencia en fitness *</Label>
           <Select
-            value={formData.experience}
-            onValueChange={(value) => updateFormData("experience", value)}
+            value={formData.experienceLevel}
+            onValueChange={(value) => updateFormData("experienceLevel", value)}
           >
             <SelectTrigger>
               <Award className="h-4 w-4 mr-2" />

@@ -32,7 +32,7 @@ const AuthContext = createContext<AuthContext | undefined>(undefined);
 type AuthProviderProps = PropsWithChildren;
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string>("");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -55,19 +55,17 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         password,
       });
 
-      console.log(res);
-
       const { accessToken, user } = res.data;
 
-      setAuthToken(authToken);
+      setAuthToken(accessToken);
       setCurrentUser(user);
 
-      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("authToken", accessToken);
       localStorage.setItem("currentUser", JSON.stringify(user));
 
       return { success: true };
     } catch (error: any) {
-      setAuthToken(null);
+      setAuthToken("");
       setCurrentUser(null);
 
       const errorMessage =
@@ -86,16 +84,9 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         email: data.email,
         password: data.password,
         fitnessGoal: data.fitnessGoal,
-        currentWeight: data.currentWeight
-          ? Number.parseFloat(data.currentWeight)
-          : undefined,
-        targetWeight: data.targetWeight
-          ? Number.parseFloat(data.targetWeight)
-          : undefined,
-        height: data.height ? Number.parseInt(data.height) : undefined,
-        activityLevel: data.activityLevel,
-        experience: data.experience,
-        acceptMarketing: data.acceptMarketing,
+        weightKg: data.weightKg,
+        heightCm: data.heightCm,
+        experienceLevel: data.experienceLevel,
       };
 
       const res = await axios.post(
@@ -103,9 +94,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         registerPayload,
       );
 
-      const { authToken, user } = res.data;
+      const { accessToken, user } = res.data;
 
-      setAuthToken(authToken);
+      setAuthToken(accessToken);
+
       setCurrentUser(user);
 
       localStorage.setItem("authToken", authToken);
@@ -122,7 +114,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function handleLogout() {
-    setAuthToken(null);
+    setAuthToken("");
     setCurrentUser(null);
 
     localStorage.removeItem("authToken");

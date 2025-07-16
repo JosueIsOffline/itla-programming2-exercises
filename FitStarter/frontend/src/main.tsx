@@ -10,18 +10,10 @@ import Progress from "./pages/progress.tsx";
 import Nutrition from "./pages/nutrition.tsx";
 import Timer from "./pages/timer.tsx";
 import NotFound from "./pages/not-found.tsx";
-import AuthProvider, { useAuth } from "./components/auth-provider.tsx";
+
+import AuthProvider from "./components/auth-provider.tsx";
 import ProtectedRoute from "./components/protected-route.tsx";
 import { AuthPage } from "./pages/auth.tsx";
-// Datos de ejemplo
-const userData = {
-  name: "Josue Hernandez",
-  email: "ana.garcia@email.com",
-  fitnessGoal: "lose_weight",
-  currentWeight: 70.5,
-  targetWeight: 68.0,
-  memberSince: "2024-01-15",
-};
 
 const router = createBrowserRouter([
   {
@@ -32,7 +24,7 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <ProtectedRoute>
-        <Layout title="FitStarter">
+        <Layout>
           <Outlet />
         </Layout>
       </ProtectedRoute>

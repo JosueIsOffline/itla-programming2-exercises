@@ -3,7 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 import { useState } from "react";
-import type { RegisterData } from "../register-form";
+
+import type { RegisterData } from "@/types/user";
 
 interface PersonalInfoStepProps {
   formData: RegisterData;

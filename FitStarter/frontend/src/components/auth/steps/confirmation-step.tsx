@@ -1,10 +1,9 @@
-"use client";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, User, Target } from "lucide-react";
-import type { RegisterData } from "../register-form";
+
+import type { RegisterData } from "@/types/user";
 
 interface ConfirmationStepProps {
   formData: RegisterData;
@@ -104,30 +103,31 @@ export default function ConfirmationStep({
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Peso actual:</span>
-                <span className="font-medium">{formData.currentWeight} kg</span>
+
+                <span className="font-medium">{formData.weightKg} kg</span>
               </div>
-              {formData.targetWeight && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Peso objetivo:</span>
-                  <span className="font-medium">
-                    {formData.targetWeight} kg
-                  </span>
-                </div>
-              )}
+              {/* {formData.targetWeight && ( */}
+              {/*   <div className="flex justify-between"> */}
+              {/*     <span className="text-gray-600">Peso objetivo:</span> */}
+              {/*     <span className="font-medium"> */}
+              {/*       {formData.targetWeight} kg */}
+              {/*     </span> */}
+              {/*   </div> */}
+              {/* )} */}
               <div className="flex justify-between">
                 <span className="text-gray-600">Altura:</span>
-                <span className="font-medium">{formData.height} cm</span>
+                <span className="font-medium">{formData.heightCm} cm</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Actividad:</span>
-                <span className="font-medium">
-                  {getActivityLabel(formData.activityLevel)}
-                </span>
-              </div>
+              {/* <div className="flex justify-between"> */}
+              {/*   <span className="text-gray-600">Actividad:</span> */}
+              {/*   <span className="font-medium"> */}
+              {/*     {getActivityLabel(formData.activityLevel)} */}
+              {/*   </span> */}
+              {/* </div> */}
               <div className="flex justify-between">
                 <span className="text-gray-600">Experiencia:</span>
                 <span className="font-medium">
-                  {getExperienceLabel(formData.experience)}
+                  {getExperienceLabel(formData.experienceLevel)}
                 </span>
               </div>
             </div>
@@ -140,10 +140,11 @@ export default function ConfirmationStep({
         <div className="flex items-start space-x-3">
           <Checkbox
             id="terms"
-            checked={formData.acceptTerms}
-            onCheckedChange={(checked) =>
-              updateFormData("acceptTerms", checked as boolean)
-            }
+            // checked={formData.acceptTerms}
+            // onCheckedChange={(checked) =>
+            //   updateFormData("acceptTerms", checked as boolean)
+            // }
+
             className="mt-1"
           />
           <div className="space-y-1">
@@ -167,28 +168,28 @@ export default function ConfirmationStep({
           </div>
         </div>
 
-        <div className="flex items-start space-x-3">
-          <Checkbox
-            id="marketing"
-            checked={formData.acceptMarketing}
-            onCheckedChange={(checked) =>
-              updateFormData("acceptMarketing", checked as boolean)
-            }
-            className="mt-1"
-          />
-          <div className="space-y-1">
-            <Label
-              htmlFor="marketing"
-              className="text-sm font-medium cursor-pointer"
-            >
-              Recibir consejos y actualizaciones por email
-            </Label>
-            <p className="text-xs text-gray-600">
-              Te enviaremos consejos de fitness, actualizaciones de la app y
-              ofertas especiales.
-            </p>
-          </div>
-        </div>
+        {/* <div className="flex items-start space-x-3"> */}
+        {/*   <Checkbox */}
+        {/*     id="marketing" */}
+        {/*     checked={formData.acceptMarketing} */}
+        {/*     onCheckedChange={(checked) => */}
+        {/*       updateFormData("acceptMarketing", checked as boolean) */}
+        {/*     } */}
+        {/*     className="mt-1" */}
+        {/*   /> */}
+        {/*   <div className="space-y-1"> */}
+        {/*     <Label */}
+        {/*       htmlFor="marketing" */}
+        {/*       className="text-sm font-medium cursor-pointer" */}
+        {/*     > */}
+        {/*       Recibir consejos y actualizaciones por email */}
+        {/*     </Label> */}
+        {/*     <p className="text-xs text-gray-600"> */}
+        {/*       Te enviaremos consejos de fitness, actualizaciones de la app y */}
+        {/*       ofertas especiales. */}
+        {/*     </p> */}
+        {/*   </div> */}
+        {/* </div> */}
       </div>
 
       <div className="bg-purple-50 p-4 rounded-lg">

@@ -20,7 +20,6 @@ namespace FitStarter.Repositories
             return entity;
         }
 
-
         public Task<List<T>> GetAll(params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _context.Set<T>();
@@ -40,8 +39,6 @@ namespace FitStarter.Repositories
             _context.Set<T>().Update(entity);
             await _context.SaveChangesAsync();
             return entity;
-
-
         }
 
         public async Task<T> Delete(int id)
