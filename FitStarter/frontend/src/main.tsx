@@ -6,10 +6,10 @@ import Dashboard from "./pages/dashboard.tsx";
 import { Layout } from "./components/layout.tsx";
 import Settings from "./pages/settings.tsx";
 import Exercises from "./pages/exercises.tsx";
-import Progress from "./pages/progress.tsx";
-import Nutrition from "./pages/nutrition.tsx";
-import Timer from "./pages/timer.tsx";
 import NotFound from "./pages/not-found.tsx";
+import WorkoutTimer from "./pages/timer.tsx";
+import ProgressTracker from "./pages/progress.tsx";
+import NutritionTips from "./pages/nutrition.tsx";
 
 const router = createBrowserRouter([
   {
@@ -22,9 +22,9 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <Dashboard /> },
       { path: "/exercises", element: <Exercises /> },
-      { path: "/timer", element: <Timer /> },
-      { path: "/progress", element: <Progress /> },
-      { path: "/nutrition", element: <Nutrition /> },
+      { path: "/timer", element: <WorkoutTimer /> },
+      { path: "/progress", element: <ProgressTracker /> },
+      { path: "/nutrition", element: <NutritionTips /> },
       { path: "settings", element: <Settings /> },
       { path: "*", element: <NotFound /> },
     ],
