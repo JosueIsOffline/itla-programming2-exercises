@@ -1,6 +1,4 @@
-import type React from "react";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -20,58 +18,75 @@ import {
   Scale,
   Calendar,
   Target,
+  Loader2,
+  Plus,
 } from "lucide-react";
+import {
+  progressApi,
+  type UserProgress,
+  type ProgressSummary,
+} from "@/lib/api-service";
+import { useAuth } from "@/components/auth-provider";
+import { toast } from "sonner";
 
-interface UserData {
-  name: string;
-  fitnessGoal: string;
-  currentWeight: number;
-  targetWeight: number;
-}
-
-interface ProgressEntry {
-  id: number;
-  date: string;
-  weight: number;
-  notes: string;
-}
-
-interface ProgressTrackerProps {
-  userData: UserData;
-}
-
-export default function ProgressTracker({ userData }: ProgressTrackerProps) {
+export default function ProgressTracker() {
   const [weight, setWeight] = useState("");
+  const [bodyFat, setBodyFat] = useState("");
   const [notes, setNotes] = useState("");
-  const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([
-    { id: 1, date: "2024-01-15", weight: 72.0, notes: "Inicio del programa" },
-    {
-      id: 2,
-      date: "2024-01-22",
-      weight: 71.5,
-      notes: "Primera semana completada",
-    },
-    {
-      id: 3,
-      date: "2024-01-29",
-      weight: 71.0,
-      notes: "Mejorando la resistencia",
-    },
-    { id: 4, date: "2024-02-05", weight: 70.5, notes: "Sintiendo más energía" },
-  ]);
+  const [progressEntries, setProgressEntries] = useState<UserProgress[]>([]);
+  const [summary, setSummary] = useState<ProgressSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const { currentUser } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    loadProgressData();
+  }, []);
+
+  const loadProgressData = async () => {
+    try {
+      setLoading(true);
+      const [entriesData, summaryData] = await Promise.all([
+        progressApi.getAll(),
+        progressApi.getSummary(),
+      ]);
+
+      setProgressEntries(entriesData);
+      setSummary(summaryData);
+    } catch (error) {
+      console.error("Error loading progress data:", error);
+      toast.error("Error al cargar los datos de progreso");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (weight) {
-      const newEntry: ProgressEntry = {
-        id: progressEntries.length + 1,
-        date: new Date().toISOString().split("T")[0],
-        weight: Number.parseFloat(weight),
+
+    if (!weight && !bodyFat) {
+      toast.error("Ingresa al menos el peso o el porcentaje de grasa corporal");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await progressApi.create({
+        weightKg: weight ? parseFloat(weight) : undefined,
+        bodyFatPercent: bodyFat ? parseFloat(bodyFat) : undefined,
         notes: notes || "",
-      };
-      setProgressEntries([newEntry, ...progressEntries]);
+      });
+
+      toast.success("Progreso registrado exitosamente");
       setWeight("");
+      setBodyFat("");
       setNotes("");
+      await loadProgressData();
+    } catch (error) {
+      console.error("Error saving progress:", error);
+      toast.error("Error al guardar el progreso");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -89,25 +104,22 @@ export default function ProgressTracker({ userData }: ProgressTrackerProps) {
     }
   };
 
-  const getTotalWeightChange = () => {
-    if (progressEntries.length < 2) return 0;
-    const oldest = progressEntries[progressEntries.length - 1].weight;
-    const newest = progressEntries[0].weight;
-    return newest - oldest;
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
-  const getGoalProgress = () => {
-    const currentWeight = progressEntries[0]?.weight || userData.currentWeight;
-    const startWeight =
-      progressEntries[progressEntries.length - 1]?.weight ||
-      userData.currentWeight;
-    const targetWeight = userData.targetWeight;
-
-    const totalNeeded = Math.abs(targetWeight - startWeight);
-    const achieved = Math.abs(currentWeight - startWeight);
-
-    return totalNeeded > 0 ? (achieved / totalNeeded) * 100 : 0;
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Cargando datos de progreso...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -120,10 +132,12 @@ export default function ProgressTracker({ userData }: ProgressTrackerProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {progressEntries[0]?.weight || userData.currentWeight} kg
+              {summary?.currentWeight
+                ? `${summary.currentWeight} kg`
+                : "No registrado"}
             </div>
             <p className="text-xs text-muted-foreground">
-              Meta: {userData.targetWeight} kg
+              Meta: {currentUser?.weightKg || "No definida"} kg
             </p>
           </CardContent>
         </Card>
@@ -135,8 +149,14 @@ export default function ProgressTracker({ userData }: ProgressTrackerProps) {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {getTotalWeightChange() > 0 ? "+" : ""}
-              {getTotalWeightChange().toFixed(1)} kg
+              {summary?.weightChange ? (
+                <>
+                  {summary.weightChange > 0 ? "+" : ""}
+                  {summary.weightChange.toFixed(1)} kg
+                </>
+              ) : (
+                "No disponible"
+              )}
             </div>
             <p className="text-xs text-muted-foreground">Desde el inicio</p>
           </CardContent>
@@ -144,14 +164,20 @@ export default function ProgressTracker({ userData }: ProgressTrackerProps) {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Progreso Meta</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Registros
+            </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Math.round(getGoalProgress())}%
+              {summary?.totalEntries || 0}
             </div>
-            <p className="text-xs text-muted-foreground">Hacia tu objetivo</p>
+            <p className="text-xs text-muted-foreground">
+              {summary?.lastRecordDate
+                ? `Último: ${formatDate(summary.lastRecordDate)}`
+                : "Sin registros"}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -159,14 +185,17 @@ export default function ProgressTracker({ userData }: ProgressTrackerProps) {
       {/* Add New Entry */}
       <Card>
         <CardHeader>
-          <CardTitle>Registrar Progreso</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            Registrar Progreso
+          </CardTitle>
           <CardDescription>
             Añade una nueva entrada para seguir tu progreso
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="weight">Peso (kg)</Label>
                 <Input
@@ -176,7 +205,17 @@ export default function ProgressTracker({ userData }: ProgressTrackerProps) {
                   placeholder="70.5"
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
-                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bodyFat">Grasa Corporal (%)</Label>
+                <Input
+                  id="bodyFat"
+                  type="number"
+                  step="0.1"
+                  placeholder="15.5"
+                  value={bodyFat}
+                  onChange={(e) => setBodyFat(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -198,8 +237,15 @@ export default function ProgressTracker({ userData }: ProgressTrackerProps) {
                 onChange={(e) => setNotes(e.target.value)}
               />
             </div>
-            <Button type="submit" className="w-full">
-              Guardar Progreso
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Guardando...
+                </>
+              ) : (
+                "Guardar Progreso"
+              )}
             </Button>
           </form>
         </CardContent>
@@ -216,46 +262,68 @@ export default function ProgressTracker({ userData }: ProgressTrackerProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {progressEntries.map((entry, index) => {
-              const previousEntry = progressEntries[index + 1];
-              const trend = previousEntry
-                ? getWeightTrend(entry.weight, previousEntry.weight)
-                : null;
+            {progressEntries.length === 0 ? (
+              <div className="text-center py-8">
+                <Scale className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">
+                  No hay registros de progreso
+                </h3>
+                <p className="text-muted-foreground">
+                  Añade tu primer registro para comenzar a seguir tu progreso
+                </p>
+              </div>
+            ) : (
+              progressEntries.map((entry, index) => {
+                const previousEntry = progressEntries[index + 1];
+                const trend =
+                  previousEntry && entry.weightKg && previousEntry.weightKg
+                    ? getWeightTrend(entry.weightKg, previousEntry.weightKg)
+                    : null;
 
-              return (
-                <div
-                  key={entry.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <div className="text-lg font-semibold">
-                        {entry.weight} kg
+                return (
+                  <div
+                    key={entry.id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold">
+                          {entry.weightKg
+                            ? `${entry.weightKg} kg`
+                            : "No registrado"}
+                        </div>
+                        {entry.bodyFatPercent && (
+                          <div className="text-sm text-muted-foreground">
+                            {entry.bodyFatPercent}% grasa
+                          </div>
+                        )}
+                        <div className="text-sm text-muted-foreground">
+                          {formatDate(entry.recordDate)}
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(entry.date).toLocaleDateString("es-ES")}
-                      </div>
+                      {trend && (
+                        <div
+                          className={`flex items-center gap-1 ${trend.color}`}
+                        >
+                          <trend.icon className="h-4 w-4" />
+                          <span className="text-sm">{trend.text}</span>
+                        </div>
+                      )}
                     </div>
-                    {trend && (
-                      <div className={`flex items-center gap-1 ${trend.color}`}>
-                        <trend.icon className="h-4 w-4" />
-                        <span className="text-sm">{trend.text}</span>
-                      </div>
-                    )}
+                    <div className="text-right max-w-xs">
+                      {entry.notes && (
+                        <p className="text-sm text-muted-foreground">
+                          {entry.notes}
+                        </p>
+                      )}
+                      {index === 0 && (
+                        <Badge className="mt-1">Más reciente</Badge>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-right max-w-xs">
-                    {entry.notes && (
-                      <p className="text-sm text-muted-foreground">
-                        {entry.notes}
-                      </p>
-                    )}
-                    {index === 0 && (
-                      <Badge className="mt-1">Más reciente</Badge>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </div>
         </CardContent>
       </Card>

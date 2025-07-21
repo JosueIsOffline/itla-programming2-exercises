@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -12,16 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import {
-  Bell,
-  Search,
-  User,
-  Settings,
-  LogOut,
-  Crown,
-  Moon,
-  Sun,
-} from "lucide-react";
+import { Bell, User, Settings, LogOut, Crown, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useAuth } from "./auth-provider";
 

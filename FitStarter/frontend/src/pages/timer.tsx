@@ -16,26 +16,24 @@ import {
 } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Play, Pause, Square, RotateCcw, Flame } from "lucide-react";
+import {
+  Timer,
+  Play,
+  Pause,
+  Square,
+  RotateCcw,
+  Flame,
+  Loader2,
+} from "lucide-react";
+import {
+  exerciseApi,
+  workoutSessionApi,
+  type Exercise,
+} from "@/lib/api-service";
+import { toast } from "sonner";
 
-interface Exercise {
-  id: number;
-  name: string;
-  muscleGroup: string;
-  type: string;
-  duration: number;
-  caloriesPerMinute: number;
-}
-
-interface WorkoutTimerProps {
-  exercises: Exercise[];
-  onWorkoutComplete: (exercise: Exercise, duration: number) => void;
-}
-
-export default function WorkoutTimer({
-  exercises,
-  onWorkoutComplete,
-}: WorkoutTimerProps) {
+export default function WorkoutTimer() {
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
     null,
   );
@@ -43,7 +41,13 @@ export default function WorkoutTimer({
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [totalTime, setTotalTime] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [completing, setCompleting] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    loadExercises();
+  }, []);
 
   useEffect(() => {
     if (isRunning && timeLeft > 0) {
@@ -52,9 +56,7 @@ export default function WorkoutTimer({
           if (prev <= 1) {
             setIsRunning(false);
             setIsPaused(false);
-            if (selectedExercise) {
-              onWorkoutComplete(selectedExercise, Math.floor(totalTime / 60));
-            }
+            handleWorkoutComplete();
             return 0;
           }
           return prev - 1;
@@ -71,12 +73,53 @@ export default function WorkoutTimer({
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, timeLeft, selectedExercise, totalTime, onWorkoutComplete]);
+  }, [isRunning, timeLeft]);
+
+  const loadExercises = async () => {
+    try {
+      setLoading(true);
+      const data = await exerciseApi.getAll();
+      setExercises(data);
+    } catch (error) {
+      console.error("Error loading exercises:", error);
+      toast.error("Error al cargar los ejercicios");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleWorkoutComplete = async () => {
+    if (!selectedExercise || completing) return;
+
+    try {
+      setCompleting(true);
+      const actualDuration = Math.floor((totalTime - timeLeft) / 60);
+      const calories = Math.round(
+        selectedExercise.caloriesPerMinute *
+          (actualDuration || selectedExercise.durationMinutes),
+      );
+
+      await workoutSessionApi.create({
+        exerciseId: selectedExercise.id,
+        durationMinutes: actualDuration || selectedExercise.durationMinutes,
+        caloriesBurned: calories,
+        completed: true,
+        notes: `Completado con cronómetro: ${selectedExercise.name}`,
+      });
+
+      toast.success(`¡Ejercicio ${selectedExercise.name} completado! 🎉`);
+    } catch (error) {
+      console.error("Error completing workout:", error);
+      toast.error("Error al registrar el ejercicio");
+    } finally {
+      setCompleting(false);
+    }
+  };
 
   const startTimer = () => {
     if (selectedExercise && !isRunning) {
       if (!isPaused) {
-        const duration = selectedExercise.duration * 60; // Convert to seconds
+        const duration = selectedExercise.durationMinutes * 60; // Convert to seconds
         setTimeLeft(duration);
         setTotalTime(duration);
       }
@@ -99,7 +142,7 @@ export default function WorkoutTimer({
 
   const resetTimer = () => {
     if (selectedExercise) {
-      const duration = selectedExercise.duration * 60;
+      const duration = selectedExercise.durationMinutes * 60;
       setTimeLeft(duration);
       setTotalTime(duration);
       setIsRunning(false);
@@ -123,6 +166,41 @@ export default function WorkoutTimer({
     const elapsedMinutes = (totalTime - timeLeft) / 60;
     return Math.round(selectedExercise.caloriesPerMinute * elapsedMinutes);
   };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "cardio":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+      case "strength":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+      case "flexibility":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
+    }
+  };
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case "cardio":
+        return "Cardio";
+      case "strength":
+        return "Fuerza";
+      case "flexibility":
+        return "Flexibilidad";
+      default:
+        return type;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Cargando ejercicios...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -166,7 +244,13 @@ export default function WorkoutTimer({
                       <div className="flex items-center gap-2">
                         <span>{exercise.name}</span>
                         <Badge variant="outline" className="text-xs">
-                          {exercise.duration}min
+                          {exercise.durationMinutes}min
+                        </Badge>
+                        <Badge
+                          className={getTypeColor(exercise.exerciseType)}
+                          variant="outline"
+                        >
+                          {getTypeLabel(exercise.exerciseType)}
                         </Badge>
                       </div>
                     </SelectItem>
@@ -190,18 +274,30 @@ export default function WorkoutTimer({
                       <div className="flex justify-center gap-4 text-sm">
                         <div className="flex items-center gap-1">
                           <Timer className="h-4 w-4" />
-                          <span>{selectedExercise.duration} min</span>
+                          <span>{selectedExercise.durationMinutes} min</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Flame className="h-4 w-4 text-orange-500" />
                           <span>
                             {selectedExercise.caloriesPerMinute *
-                              selectedExercise.duration}{" "}
-                            kcal
+                              selectedExercise.durationMinutes}{" "}
+                            kcal estimadas
                           </span>
                         </div>
                       </div>
+                      <Badge
+                        className={getTypeColor(selectedExercise.exerciseType)}
+                      >
+                        {getTypeLabel(selectedExercise.exerciseType)}
+                      </Badge>
                     </div>
+                    {selectedExercise.description && (
+                      <div className="mt-4 p-3 bg-background rounded-lg">
+                        <p className="text-sm text-center">
+                          {selectedExercise.description}
+                        </p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -223,7 +319,7 @@ export default function WorkoutTimer({
                 </div>
 
                 {/* Timer Controls */}
-                <div className="flex justify-center gap-3">
+                <div className="flex justify-center gap-3 flex-wrap">
                   {!isRunning ? (
                     <Button
                       onClick={startTimer}
@@ -268,18 +364,24 @@ export default function WorkoutTimer({
 
                 {/* Workout Complete Message */}
                 {timeLeft === 0 && totalTime > 0 && (
-                  <Card className="bg-green-50 border-green-200">
+                  <Card className="bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800">
                     <CardContent className="pt-6 text-center">
-                      <div className="text-green-800">
+                      <div className="text-green-800 dark:text-green-200">
                         <h3 className="text-lg font-semibold mb-2">
                           ¡Entrenamiento Completado! 🎉
                         </h3>
                         <p>
                           Has quemado aproximadamente{" "}
                           {selectedExercise.caloriesPerMinute *
-                            selectedExercise.duration}{" "}
+                            selectedExercise.durationMinutes}{" "}
                           calorías
                         </p>
+                        {completing && (
+                          <div className="flex items-center justify-center gap-2 mt-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>Registrando ejercicio...</span>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>

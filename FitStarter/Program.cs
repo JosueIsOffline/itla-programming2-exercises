@@ -55,7 +55,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5174")
+            policy.WithOrigins("http://localhost:5173")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -99,6 +99,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IDatabaseSeederService, DatabaseSeederService>();
 
 var app = builder.Build();
 
@@ -110,6 +111,12 @@ if (app.Environment.IsDevelopment())
 
     // app.UseSwaggerUI();
     // app.UseSwagger();
+    //
+    using (var scope = app.Services.CreateScope())
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<IDatabaseSeederService>();
+        await seeder.SeedDatabaseAsync();
+    }
 }
 
 app.UseCors("AllowFrontend");

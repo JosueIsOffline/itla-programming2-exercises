@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -16,89 +16,99 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Activity, Clock, Flame, Search, Filter } from "lucide-react";
+import { Activity, Clock, Flame, Search, Filter, Loader2 } from "lucide-react";
+import {
+  exerciseApi,
+  workoutSessionApi,
+  type Exercise,
+} from "@/lib/api-service";
+import { toast } from "sonner";
 
 export default function ExerciseList() {
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [filteredExercises, setFilteredExercises] = useState<Exercise[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
-  const [activeSection, setActiveSection] = useState("dashboard");
-  const [todayWorkouts, setTodayWorkouts] = useState(0);
-  const [totalCalories, setTotalCalories] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [submittingExercise, setSubmittingExercise] = useState<number | null>(
+    null,
+  );
 
-  const exercises = [
-    {
-      id: 1,
-      name: "Flexiones",
-      muscleGroup: "Pecho",
-      type: "strength",
-      duration: 10,
-      caloriesPerMinute: 8,
-    },
-    {
-      id: 2,
-      name: "Sentadillas",
-      muscleGroup: "Piernas",
-      type: "strength",
-      duration: 10,
-      caloriesPerMinute: 6,
-    },
-    {
-      id: 3,
-      name: "Plancha",
-      muscleGroup: "Core",
-      type: "strength",
-      duration: 5,
-      caloriesPerMinute: 5,
-    },
-    {
-      id: 4,
-      name: "Jumping Jacks",
-      muscleGroup: "Todo el cuerpo",
-      type: "cardio",
-      duration: 10,
-      caloriesPerMinute: 10,
-    },
-    {
-      id: 5,
-      name: "Burpees",
-      muscleGroup: "Todo el cuerpo",
-      type: "cardio",
-      duration: 10,
-      caloriesPerMinute: 12,
-    },
-    {
-      id: 6,
-      name: "Estiramiento",
-      muscleGroup: "Todo el cuerpo",
-      type: "flexibility",
-      duration: 15,
-      caloriesPerMinute: 2,
-    },
-  ];
-  const handleWorkoutComplete = (exercise: any, duration: number) => {
-    const calories = exercise.caloriesPerMinute * duration;
-    setTodayWorkouts((prev) => prev + 1);
-    setTotalCalories((prev) => prev + calories);
+  useEffect(() => {
+    loadExercises();
+  }, []);
+
+  useEffect(() => {
+    filterExercises();
+  }, [exercises, searchTerm, filterType]);
+
+  const loadExercises = async () => {
+    try {
+      setLoading(true);
+      const data = await exerciseApi.getAll();
+      setExercises(data);
+    } catch (error) {
+      console.error("Error loading exercises:", error);
+      toast.error("Error al cargar los ejercicios");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredExercises = exercises.filter((exercise) => {
-    const matchesSearch =
-      exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      exercise.muscleGroup.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterType === "all" || exercise.type === filterType;
-    return matchesSearch && matchesFilter;
-  });
+  const filterExercises = () => {
+    let filtered = exercises;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (exercise) =>
+          exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          exercise.muscleGroup.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
+    }
+
+    // Filter by type
+    if (filterType !== "all") {
+      filtered = filtered.filter(
+        (exercise) => exercise.exerciseType === filterType,
+      );
+    }
+
+    setFilteredExercises(filtered);
+  };
+
+  const handleWorkoutComplete = async (exercise: Exercise) => {
+    try {
+      setSubmittingExercise(exercise.id);
+      const calories = exercise.caloriesPerMinute * exercise.durationMinutes;
+
+      await workoutSessionApi.create({
+        exerciseId: exercise.id,
+        durationMinutes: exercise.durationMinutes,
+        caloriesBurned: calories,
+        completed: true,
+        notes: `Completado: ${exercise.name}`,
+      });
+
+      toast.success(`¡Ejercicio ${exercise.name} completado! 🎉`);
+    } catch (error) {
+      console.error("Error completing workout:", error);
+      toast.error("Error al registrar el ejercicio");
+    } finally {
+      setSubmittingExercise(null);
+    }
+  };
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case "cardio":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
       case "strength":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
       case "flexibility":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
   };
 
@@ -115,6 +125,28 @@ export default function ExerciseList() {
     }
   };
 
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case "cardio":
+        return "Cardio";
+      case "strength":
+        return "Fuerza";
+      case "flexibility":
+        return "Flexibilidad";
+      default:
+        return type;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Cargando ejercicios...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -124,7 +156,8 @@ export default function ExerciseList() {
             Biblioteca de Ejercicios
           </CardTitle>
           <CardDescription>
-            Explora nuestra colección de ejercicios básicos para principiantes
+            Explora nuestra colección de ejercicios para alcanzar tus objetivos
+            fitness
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -162,7 +195,7 @@ export default function ExerciseList() {
                 <div>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <span className="text-2xl">
-                      {getTypeIcon(exercise.type)}
+                      {getTypeIcon(exercise.exerciseType)}
                     </span>
                     {exercise.name}
                   </CardTitle>
@@ -170,12 +203,8 @@ export default function ExerciseList() {
                     {exercise.muscleGroup}
                   </CardDescription>
                 </div>
-                <Badge className={getTypeColor(exercise.type)}>
-                  {exercise.type === "cardio"
-                    ? "Cardio"
-                    : exercise.type === "strength"
-                      ? "Fuerza"
-                      : "Flexibilidad"}
+                <Badge className={getTypeColor(exercise.exerciseType)}>
+                  {getTypeLabel(exercise.exerciseType)}
                 </Badge>
               </div>
             </CardHeader>
@@ -184,30 +213,44 @@ export default function ExerciseList() {
                 <div className="flex justify-between text-sm">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span>{exercise.duration} min</span>
+                    <span>{exercise.durationMinutes} min</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Flame className="h-4 w-4 text-orange-500" />
                     <span>
-                      {exercise.caloriesPerMinute * exercise.duration} kcal
+                      {exercise.caloriesPerMinute * exercise.durationMinutes}{" "}
+                      kcal
                     </span>
                   </div>
                 </div>
 
-                <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    Quema aproximadamente{" "}
-                    <strong>{exercise.caloriesPerMinute} kcal/min</strong>
-                  </p>
-                </div>
+                {exercise.description && (
+                  <div className="p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      {exercise.description}
+                    </p>
+                  </div>
+                )}
+
+                {exercise.instructions && (
+                  <div className="text-xs text-muted-foreground">
+                    <strong>Instrucciones:</strong> {exercise.instructions}
+                  </div>
+                )}
 
                 <Button
                   className="w-full"
-                  onClick={() =>
-                    handleWorkoutComplete(exercise, exercise.duration)
-                  }
+                  onClick={() => handleWorkoutComplete(exercise)}
+                  disabled={submittingExercise === exercise.id}
                 >
-                  Completar Ejercicio
+                  {submittingExercise === exercise.id ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Registrando...
+                    </>
+                  ) : (
+                    "Completar Ejercicio"
+                  )}
                 </Button>
               </div>
             </CardContent>
@@ -215,7 +258,7 @@ export default function ExerciseList() {
         ))}
       </div>
 
-      {filteredExercises.length === 0 && (
+      {filteredExercises.length === 0 && !loading && (
         <Card>
           <CardContent className="text-center py-8">
             <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
