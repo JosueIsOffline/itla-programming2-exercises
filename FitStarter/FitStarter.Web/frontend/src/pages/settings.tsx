@@ -31,19 +31,24 @@ import {
   Crown,
   Camera,
 } from "lucide-react";
+import { useAuth } from "@/components/auth-provider";
 
-interface SettingsProps {
-  userData: {
-    name: string;
-    email: string;
-    fitnessGoal: string;
-    currentWeight: number;
-    targetWeight: number;
-    memberSince: string;
-  };
-}
+export default function Settings() {
+  const { currentUser } = useAuth();
 
-export default function Settings({ userData }: SettingsProps) {
+  // Return loading or redirect if no user
+  if (!currentUser) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold mb-2">
+            Cargando configuración...
+          </h3>
+        </div>
+      </div>
+    );
+  }
+
   const [notifications, setNotifications] = useState({
     workoutReminders: true,
     progressUpdates: true,
@@ -52,11 +57,11 @@ export default function Settings({ userData }: SettingsProps) {
   });
 
   const [profile, setProfile] = useState({
-    name: userData.name,
-    email: userData.email,
-    fitnessGoal: userData.fitnessGoal,
-    currentWeight: userData.currentWeight.toString(),
-    targetWeight: userData.targetWeight.toString(),
+    name: currentUser.fullName,
+    email: currentUser.email,
+    fitnessGoal: currentUser.fitnessGoal,
+    currentWeight: currentUser.weightKg?.toString() || "",
+    targetWeight: "", // You might want to add this to your user model
   });
 
   const handleProfileSave = () => {
@@ -68,13 +73,41 @@ export default function Settings({ userData }: SettingsProps) {
     setNotifications((prev) => ({ ...prev, [key]: value }));
   };
 
+  const getGoalLabel = (goal: string) => {
+    switch (goal) {
+      case "lose_weight":
+        return "Perder Peso";
+      case "gain_muscle":
+        return "Ganar Músculo";
+      case "stay_fit":
+        return "Mantenerse Fit";
+      default:
+        return "Objetivo";
+    }
+  };
+
+  const getExperienceLabel = (level: string) => {
+    switch (level) {
+      case "beginner":
+        return "Principiante";
+      case "intermediate":
+        return "Intermedio";
+      case "advanced":
+        return "Avanzado";
+      default:
+        return level;
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Configuración</h1>
-        <p className="text-gray-600 mt-2">
-          Personaliza tu experiencia en FitPro
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+          Configuración
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Personaliza tu experiencia en FitStarter
         </p>
       </div>
 
@@ -100,7 +133,7 @@ export default function Settings({ userData }: SettingsProps) {
                       src="/placeholder.svg?height=80&width=80"
                       alt={profile.name}
                     />
-                    <AvatarFallback className="bg-blue-600 text-white text-xl">
+                    <AvatarFallback className="bg-purple-600 text-white text-xl">
                       {profile.name
                         .split(" ")
                         .map((n) => n[0])
@@ -117,10 +150,17 @@ export default function Settings({ userData }: SettingsProps) {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">{profile.name}</h3>
-                  <p className="text-gray-600">{profile.email}</p>
-                  <Badge className="mt-1 bg-blue-100 text-blue-800">
-                    Miembro desde {new Date(userData.memberSince).getFullYear()}
-                  </Badge>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {profile.email}
+                  </p>
+                  <div className="flex gap-2 mt-2">
+                    <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                      {getGoalLabel(currentUser.fitnessGoal)}
+                    </Badge>
+                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      {getExperienceLabel(currentUser.experienceLevel)}
+                    </Badge>
+                  </div>
                 </div>
               </div>
 
@@ -226,7 +266,7 @@ export default function Settings({ userData }: SettingsProps) {
                     <h4 className="font-medium">
                       Recordatorios de entrenamiento
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       Recibe recordatorios para tus sesiones programadas
                     </p>
                   </div>
@@ -241,7 +281,7 @@ export default function Settings({ userData }: SettingsProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Actualizaciones de progreso</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       Resúmenes semanales de tu progreso
                     </p>
                   </div>
@@ -256,7 +296,7 @@ export default function Settings({ userData }: SettingsProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Consejos nutricionales</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       Tips diarios sobre alimentación saludable
                     </p>
                   </div>
@@ -271,7 +311,7 @@ export default function Settings({ userData }: SettingsProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium">Logros y insignias</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       Notificaciones cuando alcances nuevos logros
                     </p>
                   </div>
@@ -317,18 +357,18 @@ export default function Settings({ userData }: SettingsProps) {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Upgrade Card */}
-          <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
+          <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200 dark:from-yellow-950 dark:to-orange-950 dark:border-yellow-800">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-yellow-800">
+              <CardTitle className="flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
                 <Crown className="h-5 w-5" />
                 Upgrade a Pro
               </CardTitle>
-              <CardDescription className="text-yellow-700">
+              <CardDescription className="text-yellow-700 dark:text-yellow-300">
                 Desbloquea funciones premium
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2 text-sm text-yellow-800 mb-4">
+              <ul className="space-y-2 text-sm text-yellow-800 dark:text-yellow-200 mb-4">
                 <li>• Rutinas personalizadas</li>
                 <li>• Análisis avanzado</li>
                 <li>• Sin anuncios</li>
