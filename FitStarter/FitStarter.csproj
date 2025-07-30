@@ -4,12 +4,15 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	  <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
@@ -25,6 +28,12 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.5.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.12.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="FitStarter.Application\FitStarter.Application.csproj" />
+    <ProjectReference Include="FitStarter.Domain\FitStarter.Domain.csproj" />
+    <ProjectReference Include="FitStarter.Infrastructure\FitStarter.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

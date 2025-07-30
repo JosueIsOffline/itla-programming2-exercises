@@ -1,10 +1,10 @@
 using FitStarter.Application.Services;
-using FitStarter.Data;
+using FitStarter.Infrastructure.Data;
 using FitStarter.Domain.Configuration;
 using FitStarter.Domain.Interfaces;
-using FitStarter.Domain.Mapping;
-using FitStarter.Repositories;
-using FitStarter.Services;
+using FitStarter.Application.Mapping;
+using FitStarter.Infastructure.Repositories;
+using FitStarter.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;

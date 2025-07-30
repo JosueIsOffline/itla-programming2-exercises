@@ -1,8 +1,7 @@
-using FitStarter.Domain.Contracts;
-using FitStarter.Domain.Models;
 using FitStarter.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using FitStarter.Common.Requests;
 
 namespace FitStarter.Controllers
 {
