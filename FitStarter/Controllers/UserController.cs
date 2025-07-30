@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
-using FitStarter.Domain.Contracts;
+using FitStarter.Application.Contracts;
+using FitStarter.Common.Requests;
 using FitStarter.Domain.Entities;
-using FitStarter.Repositories;
+using FitStarter.Infastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

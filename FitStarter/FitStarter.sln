@@ -1,9 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36203.30 d17.14
+VisualStudioVersion = 17.14.36203.30
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitStarter", "FitStarter.csproj", "{740A1BED-8041-422D-A488-73B37FD77B99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitStarter.Domain", "FitStarter.Domain\FitStarter.Domain.csproj", "{8D83621C-14C7-4903-A226-70658D3E1853}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitStarter.Infrastructure", "FitStarter.Infrastructure\FitStarter.Infrastructure.csproj", "{169028FC-A23C-44CA-9BC8-15BDAC4AF76D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitStarter.Application", "FitStarter.Application\FitStarter.Application.csproj", "{03584346-D816-45A5-9A87-126A7F430868}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitStarter.Common", "FitStarter.Common\FitStarter.Common.csproj", "{9D35935E-B8DC-4E5B-AD75-483846F00028}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FitStarter.Web", "FitStarter.Web\FitStarter.Web.csproj", "{F58F0059-70F8-4FF0-B5D7-ED0B74DCC2AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +25,26 @@ Global
 		{740A1BED-8041-422D-A488-73B37FD77B99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{740A1BED-8041-422D-A488-73B37FD77B99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{740A1BED-8041-422D-A488-73B37FD77B99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D83621C-14C7-4903-A226-70658D3E1853}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D83621C-14C7-4903-A226-70658D3E1853}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D83621C-14C7-4903-A226-70658D3E1853}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D83621C-14C7-4903-A226-70658D3E1853}.Release|Any CPU.Build.0 = Release|Any CPU
+		{169028FC-A23C-44CA-9BC8-15BDAC4AF76D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{169028FC-A23C-44CA-9BC8-15BDAC4AF76D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{169028FC-A23C-44CA-9BC8-15BDAC4AF76D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{169028FC-A23C-44CA-9BC8-15BDAC4AF76D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03584346-D816-45A5-9A87-126A7F430868}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03584346-D816-45A5-9A87-126A7F430868}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03584346-D816-45A5-9A87-126A7F430868}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03584346-D816-45A5-9A87-126A7F430868}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D35935E-B8DC-4E5B-AD75-483846F00028}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D35935E-B8DC-4E5B-AD75-483846F00028}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D35935E-B8DC-4E5B-AD75-483846F00028}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D35935E-B8DC-4E5B-AD75-483846F00028}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F58F0059-70F8-4FF0-B5D7-ED0B74DCC2AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F58F0059-70F8-4FF0-B5D7-ED0B74DCC2AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F58F0059-70F8-4FF0-B5D7-ED0B74DCC2AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F58F0059-70F8-4FF0-B5D7-ED0B74DCC2AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
